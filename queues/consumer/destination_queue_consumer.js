@@ -1,7 +1,10 @@
 const { Kafka } = require("kafkajs");
 // const Services = require("../../services/services");
 const { recurse } = require("../producer/event_queue");
-const { insert_destinations } = require("../../services/services");
+const {
+  insert_destinations,
+  create_partitions,
+} = require("../../services/services");
 const kafka = new Kafka({
   enforceRequestTimeout: true,
   clientId: "my-app",
@@ -20,12 +23,15 @@ async function main() {
     eachMessage: async ({ topic, partition, message }) => {
       const productData = await JSON.parse(message.value.toString());
 
-      await insert_destinations(
-        productData.destinationId,
-        productData.destinationName
-      );
+      // await insert_destinations(
+      //   productData.destinationId,
+      //   productData.destinationName,
+      // );
 
-      await create_event_table(productData.destinationId, destinationName);
+      await create_partitions(
+        productData.destinationId,
+        productData.destinationName,
+      );
       // const result = Services.createDestinations();
       //  await recurse(productData);
     },
