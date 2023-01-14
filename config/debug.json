@@ -1,0 +1,11 @@
+{
+  "database": {
+    "pgsql": {
+      "host": "127.0.0.1",
+      "port": 7778,
+      "database": "test_db",
+      "user": "docker",
+      "password": "docker"
+    }
+  }
+}
