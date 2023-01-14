@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const destinationApi = require("./controller/controller");
 const db = require("./adapter/pgsql");
-const { createDestinations } = require("./services/services");
+
+const { createDestinations, create_event_table } = require("./services/services");
 const port = 3000;
 // var db = new adapter();;
 
@@ -17,5 +18,9 @@ app.listen(port, () => {
 
 app.post("/createDestinationsTable", async (req, res) => {
   const result = await createDestinations();
+  res.send(result);
+});
+app.post("/createEventsTable", async (req, res) => {
+  const result = await create_event_table();
   res.send(result);
 });

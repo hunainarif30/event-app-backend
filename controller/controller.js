@@ -24,6 +24,7 @@ async function destinationApi() {
           element.count
           // producer
         );
+        // ---> db destinations insert
       }
     });
 
