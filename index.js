@@ -7,6 +7,7 @@ const {
   createDestinations,
   create_event_table,
   DropAll,
+  createCurrency,
 } = require("./services/services");
 const port = 3000;
 // var db = new adapter();;
@@ -26,6 +27,11 @@ app.post("/createDestinationsTable", async (req, res) => {
 });
 app.post("/createEventsTable", async (req, res) => {
   const result = await create_event_table();
+  res.send(result);
+});
+app.post("/createCurrencyTable", async (req, res) => {
+  const result = await createCurrency();
+
   res.send(result);
 });
 

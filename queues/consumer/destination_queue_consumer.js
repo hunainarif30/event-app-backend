@@ -28,12 +28,11 @@ async function main() {
       //   productData.destinationName,
       // );
 
-      await create_partitions(
-        productData.destinationId,
-        productData.destinationName,
-      );
-      // const result = Services.createDestinations();
-      //  await recurse(productData);
+      // await create_partitions(
+      //   productData.destinationId,
+      //   productData.destinationName
+      // );
+      await recurse(productData);
     },
   });
 }

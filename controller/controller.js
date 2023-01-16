@@ -7,10 +7,14 @@ async function destinationApi() {
   try {
     //  const producer = createKafka();
     const result = await destinationInfo();
-    let newArray = result.slice(0, 2);
+    const BreakError = {};
+    // let newArray = result.slice(0, 2);
     // console.log(newArray);
 
-    newArray.forEach(async (element) => {
+    result.map(async (element) => {
+      if (element.sortOrder > 2) {
+        return;
+      }
       element.start = -1;
       element.count = 0;
 
@@ -27,9 +31,9 @@ async function destinationApi() {
         // ---> db destinations insert
       }
     });
-
     return 200;
   } catch (e) {
+   // if (e !== BreakError) throw e;
     console.log(e);
     return 500;
   }

@@ -1,12 +1,12 @@
 const { eventInfo } = require("../../apis/event_api");
 const { delayedQueue } = require("./delayed_queue");
 const createKafka = require("./kafkaproducer.js");
-const kafkaProducer = async (data, producer) => {
+const kafkaProducer = async (data, producer, destinationId) => {
   try {
     await producer.connect();
     await producer.send({
       topic: "events-data",
-      messages: [{ value: JSON.stringify(data) }],
+      messages: [{ value: JSON.stringify({data, destinationId}) }],
     });
     console.log("data pusblished to kafka topic");
     await producer.disconnect();
@@ -23,7 +23,8 @@ async function recurse(data) {
     try {
       start = start + 1;
       const productData = await eventInfo(start * 10 + 1, data.destinationId);
-      await kafkaProducer(productData.products, producer);
+      productData.products
+      await kafkaProducer(productData.products, producer, data.destinationId);
       count = productData.totalCount;
     } catch (e) {
       await delayedQueue(
