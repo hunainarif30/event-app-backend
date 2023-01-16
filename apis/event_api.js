@@ -5,6 +5,7 @@ const version = config.get("version");
 const destination = config.get("destination");
 const event = config.get("event");
 
+
 async function destinationInfo() {
   const response = await axios({
     method: "get",
@@ -19,6 +20,7 @@ async function eventInfo(start, destinationId) {
     method: "post",
     url: url + event,
     headers: config.get("headers"),
+
     data: {
       filtering: {
         destination: destinationId,
