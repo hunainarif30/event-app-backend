@@ -5,12 +5,7 @@ const { destinationInfo } = require("../apis/event_api");
 
 async function destinationApi() {
   try {
-    //  const producer = createKafka();
     const result = await destinationInfo();
-    const BreakError = {};
-    // let newArray = result.slice(0, 2);
-    // console.log(newArray);
-
     result.map(async (element) => {
       if (element.sortOrder > 2) {
         return;
@@ -25,7 +20,7 @@ async function destinationApi() {
 
           element.destinationName,
           element.start,
-          element.count
+          element.count,
           // producer
         );
         // ---> db destinations insert
@@ -33,7 +28,7 @@ async function destinationApi() {
     });
     return 200;
   } catch (e) {
-   // if (e !== BreakError) throw e;
+    // if (e !== BreakError) throw e;
     console.log(e);
     return 500;
   }
