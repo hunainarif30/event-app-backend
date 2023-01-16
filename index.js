@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const destinationApi = require("./controller/controller");
 const {
-  createDestinations,
   create_event_table,
   DropAll,
   createCurrency,
@@ -15,18 +14,12 @@ app.get("/postDestinations", async (req, res) => {
   console.log(result);
   res.sendStatus(result);
 });
-app.listen(port, () => {
-  console.log(`Event app listening on port ${port}`);
-});
 
-app.post("/createDestinationsTable", async (req, res) => {
-  const result = await createDestinations();
-  res.sendStatus(result);
-});
 app.post("/createEventsTable", async (req, res) => {
   const result = await create_event_table();
   res.sendStatus(result);
 });
+
 app.post("/createCurrencyTable", async (req, res) => {
   const result = await createCurrency();
 
@@ -36,4 +29,8 @@ app.post("/createCurrencyTable", async (req, res) => {
 app.post("/dropAll", async (req, res) => {
   const result = await DropAll();
   res.sendStatus(result);
+});
+
+app.listen(port, () => {
+  console.log(`Event app listening on port ${port}`);
 });
