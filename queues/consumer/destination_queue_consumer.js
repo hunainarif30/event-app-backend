@@ -1,10 +1,7 @@
 const { Kafka } = require("kafkajs");
 // const Services = require("../../services/services");
 const { recurse } = require("../producer/event_queue");
-const {
-  insert_destinations,
-  create_partitions,
-} = require("../../services/services");
+const { insert_destinations } = require("../../services/services");
 const kafka = new Kafka({
   enforceRequestTimeout: true,
   clientId: "my-app",
@@ -27,7 +24,7 @@ async function main() {
         productData.destinationId,
         productData.destinationName,
       );
-      // await recurse(productData);
+      await recurse(productData);
     },
   });
 }

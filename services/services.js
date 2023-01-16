@@ -12,10 +12,12 @@ async function insert_destinations(id, destination_city) {
 }
 
 async function create_partitions(destination_id, destinationName) {
-  Tablename = destinationName.replace(/\s/g, "");
-  Tablename = Tablename.replace(/-/g, "");
+  Tablename = destinationName.replace(
+    /[\(\)-\s\&\'\"\$\@\#\%\^\,\.\!\_\|\=\?\:\;]+/g,
+    "",
+  );
   const result = await db.query(
-    `CREATE TABLE ${Tablename} PARTITION OF events FOR VALUES IN (${destination_id})`,
+    `CREATE TABLE IF NOT EXISTS ${Tablename} PARTITION OF events FOR VALUES IN (${destination_id})`,
   );
   console.log(result);
   return result;
