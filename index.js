@@ -7,6 +7,7 @@ const {
   createCurrency,
 } = require("./services/services");
 const port = 3000;
+require("./api_scheduler/api_scheduler.js");
 
 app.get("/postDestinations", async (req, res) => {
   const result = await destinationApi();
