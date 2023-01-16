@@ -1,4 +1,7 @@
 {
+  "version": "v1",
+  "destination": "/taxonomy/destinations",
+  "event": "products/search",
   "database": {
     "pgsql": {
       "host": "127.0.0.1",
@@ -13,5 +16,6 @@
     "Accept": "application/json;version=2.0",
     "Accept-Language": "en-US",
     "rejectUnauthorized": false
-  }
+  },
+  "base_url": "https://api.viator.com/partner/"
 }

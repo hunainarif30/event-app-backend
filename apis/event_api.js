@@ -1,17 +1,16 @@
 const axios = require("axios");
-require("dotenv").config();
-const headers = require("../config/debug.json");
+const config = require("../config/config");
+const url = config.get("base_url");
+const version = config.get("version");
+const destination = config.get("destination");
+const event = config.get("event");
+
 
 async function destinationInfo() {
   const response = await axios({
     method: "get",
-    url: `https://api.viator.com/partner/v1/taxonomy/destinations`,
-    headers: {
-      "exp-api-key": "4d1960fb-a0b2-4ed5-8194-811ef09a9db8",
-      Accept: "application/json;version=2.0",
-      "Accept-Language": "en-US",
-      rejectUnauthorized: false,
-    },
+    url: url + version + destination,
+    headers: config.get("headers"),
   });
 
   return response.data.data;
@@ -19,13 +18,9 @@ async function destinationInfo() {
 async function eventInfo(start, destinationId) {
   const response = await axios({
     method: "post",
-    url: `https://api.viator.com/partner/products/search`,
-    headers: {
-      "exp-api-key": "4d1960fb-a0b2-4ed5-8194-811ef09a9db8",
-      Accept: "application/json;version=2.0",
-      "Accept-Language": "en-US",
-      rejectUnauthorized: false,
-    },
+    url: url + event,
+    headers: config.get("headers"),
+
     data: {
       filtering: {
         destination: destinationId,
