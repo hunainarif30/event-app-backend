@@ -1,36 +1,34 @@
 const express = require("express");
 const app = express();
 const destinationApi = require("./controller/controller");
-const db = require("./adapter/pgsql");
-
 const {
   create_event_table,
   DropAll,
   createCurrency,
 } = require("./services/services");
 const port = 3000;
-// var db = new adapter();;
+
 
 app.get("/postDestinations", async (req, res) => {
   const result = await destinationApi();
   console.log(result);
-  res.send(result);
+  res.sendStatus(result);
 });
 
 app.post("/createEventsTable", async (req, res) => {
   const result = await create_event_table();
-  res.send(result);
+  res.sendStatus(result);
 });
 
 app.post("/createCurrencyTable", async (req, res) => {
   const result = await createCurrency();
 
-  res.send(result);
+  res.sendStatus(result);
 });
 
 app.post("/dropAll", async (req, res) => {
   const result = await DropAll();
-  res.send(result);
+  res.sendStatus(result);
 });
 
 app.listen(port, () => {

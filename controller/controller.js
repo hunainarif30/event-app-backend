@@ -1,7 +1,20 @@
 const createKafka = require("../queues/producer/kafkaproducer");
 const { destinationQueue } = require("../queues/producer/destination_queue");
 const { destinationInfo } = require("../apis/event_api");
-// const insertDestinations = require("../queries/insert_destinations");
+
+let destinationType = {
+  CITY: async (element) => {
+    element.start = -1;
+    element.count = 0;
+    await destinationQueue(
+      element.destinationId,
+      element.destinationType,
+      element.destinationName,
+      element.start,
+      element.count
+    );
+  },
+};
 
 async function destinationApi() {
   try {
@@ -10,25 +23,10 @@ async function destinationApi() {
       if (element.sortOrder > 2) {
         return;
       }
-      element.start = -1;
-      element.count = 0;
-
-      if (element.destinationType === "CITY") {
-        await destinationQueue(
-          element.destinationId,
-          element.destinationType,
-
-          element.destinationName,
-          element.start,
-          element.count,
-          // producer
-        );
-        // ---> db destinations insert
-      }
+     await destinationType["CITY"](element);
     });
     return 200;
   } catch (e) {
-    // if (e !== BreakError) throw e;
     console.log(e);
     return 500;
   }

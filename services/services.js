@@ -107,6 +107,7 @@ async function insert_to_db(data, destination_id) {
         description: data.description,
       },
     );
+
     const q2 = t.none(
       "INSERT INTO price (event_id,currency , destination_id , price ,  discount ) VALUES (${event_id},${currency} , ${destination_id} , ${price} ,  ${discount} )",
       {

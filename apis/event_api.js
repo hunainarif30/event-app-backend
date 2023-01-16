@@ -1,8 +1,10 @@
 const axios = require("axios");
+require('dotenv').config();
+const headers = require("../config/debug.json")
 async function destinationInfo() {
   const response = await axios({
     method: "get",
-    url: "https://api.viator.com/partner/v1/taxonomy/destinations",
+    url: `${process.env.BASE_URL}/v1/taxonomy/destinations`,
     headers: {
       "exp-api-key": "4d1960fb-a0b2-4ed5-8194-811ef09a9db8",
       Accept: "application/json;version=2.0",
@@ -16,7 +18,7 @@ async function destinationInfo() {
 async function eventInfo(start, destinationId) {
   const response = await axios({
     method: "post",
-    url: "https://api.viator.com/partner/products/search",
+    url: `${process.env.BASE_URL}/products/search`,
     headers: {
       "exp-api-key": "4d1960fb-a0b2-4ed5-8194-811ef09a9db8",
       Accept: "application/json;version=2.0",
