@@ -25,12 +25,7 @@ async function main() {
       // await productData.data.map(async (item) =>
       //   console.log(item.reviews, productData.destinationId)
       // );
-      // console.log(
-      //   productData.data.map((item) => {
-      //     item.reviews;
-      //     item.productCode;
-      //   })
-      // );
+    
     },
   });
 }

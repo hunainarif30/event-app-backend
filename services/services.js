@@ -141,19 +141,18 @@ async function insert_to_db(data, destination_id) {
     //   "INSERT INTO tags ( event_id  ,tag_id , destination_id ) VALUES (${event_id} , ) "
     // );
 
-    var currency_id = 1
+    var currency_id = 1;
     //  t.any(
     //   "SELECT currency_id FROM currency WHERE currency = 'USD'"
     // );
-
+const id =1;
     const q7 = t.none(
       "INSERT INTO price (event_id,currency_id , destination_id , price ,  discount ) VALUES (${event_id},${currency_id} , ${destination_id} , ${price} ,  ${discount} )",
       {
         event_id: data.productCode,
-        currency_id: currency_id,
+        currency_id: id,
         destination_id: destination_id,
         price: data.pricing.summary.fromPrice,
-
         discount: data.pricing.summary.fromPriceBeforeDiscount,
       }
     );
@@ -162,7 +161,7 @@ async function insert_to_db(data, destination_id) {
       "INSERT INTO over_all_ranting (event_id ,rating , destination_id) VALUES (${event_id}, 123, ${destination_id} )",
       {
         event_id: data.productCode,
-      //  rating: data.reviews.combinedAverageRating,
+        //  rating: data.reviews.combinedAverageRating,
         destination_id: destination_id,
       }
     );
