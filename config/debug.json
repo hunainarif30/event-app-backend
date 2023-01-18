@@ -4,7 +4,7 @@
   "event": "products/search",
   "database": {
     "pgsql": {
-      "host": "127.0.0.1",
+      "host": "50.18.23.86",
       "port": 7778,
       "database": "test_db",
       "user": "docker",
