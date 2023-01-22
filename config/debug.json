@@ -2,6 +2,7 @@
   "version": "v1",
   "destination": "/taxonomy/destinations",
   "event": "products/search",
+  "tags": "/products/tags",
   "database": {
     "pgsql": {
       "host": "localhost",

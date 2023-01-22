@@ -6,7 +6,7 @@ const kafkaProducer = async (data, producer, destinationId) => {
     await producer.connect();
     await producer.send({
       topic: "events-data",
-      messages: [{ value: JSON.stringify({data, destinationId}) }],
+      messages: [{ value: JSON.stringify({ data, destinationId }) }],
     });
     console.log("data pusblished to kafka topic");
     await producer.disconnect();
@@ -23,7 +23,6 @@ async function recurse(data) {
     try {
       start = start + 1;
       const productData = await eventInfo(start * 10 + 1, data.destinationId);
-      productData.products
       await kafkaProducer(productData.products, producer, data.destinationId);
       count = productData.totalCount;
     } catch (e) {
@@ -31,7 +30,7 @@ async function recurse(data) {
         data.destinationId,
         data.destinationType,
         data.count,
-        start * 10 + 1
+        start * 10 + 1,
       );
       console.log("error: ", e.message);
     }

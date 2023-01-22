@@ -19,7 +19,6 @@ async function main() {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const productData = await JSON.parse(message.value.toString());
-
       await insert_destinations(
         productData.destinationId,
         productData.destinationName,

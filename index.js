@@ -1,18 +1,17 @@
 const express = require("express");
 const app = express();
-const destinationApi = require("./controller/controller");
+const startProcedure = require("./controller/controller");
 const {
   create_event_table,
   DropAll,
   createCurrency,
 } = require("./services/services");
 const port = 3000;
-require("./api_scheduler/api_scheduler.js");
+// require("./api_scheduler/api_scheduler.js");
 
 app.get("/postDestinations", async (req, res) => {
-  const result = await destinationApi();
-  console.log(result);
-  res.sendStatus(result);
+  const result = await startProcedure();
+  res.send("ok");
 });
 
 app.post("/createEventsTable", async (req, res) => {

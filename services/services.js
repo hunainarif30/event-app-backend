@@ -1,5 +1,6 @@
 //const createTable = require("../queries/create_queries");
 const db = require("../adapter/pgsql");
+var _ = require("lodash");
 const pgp = require("pg-promise")();
 const { v4: uuidv4 } = require("uuid");
 
@@ -7,6 +8,13 @@ async function insert_destinations(id, destination_city) {
   const result = await db.query(
     "INSERT INTO destinations (destination_id, city) VALUES (${id}, ${destination_city})",
     { id, destination_city },
+  );
+  return result;
+}
+async function insert_tags(tagId, tagName) {
+  const result = await db.query(
+    "INSERT INTO tag_info (tag_id, tag_name) VALUES (${tagId}, ${tagName})",
+    { tagId, tagName },
   );
   return result;
 }
@@ -23,6 +31,8 @@ async function create_partitions(destination_id, destinationName) {
   return result;
 }
 
+async function insert_reviews(data) {}
+
 async function create_event_table() {
   const result = await db.tx(async (t) => {
     const q0 = await t.none(
@@ -32,7 +42,7 @@ async function create_event_table() {
       "CREATE TABLE events (event_id VARCHAR  , destination_id varchar , title VARCHAR, description TEXT, url TEXT  , PRIMARY KEY (event_id , destination_id)) PARTITION BY LIST(destination_id)",
     );
     const q2 = await t.none(
-      "CREATE TABLE images (image_id VARCHAR PRIMARY KEY, image_url TEXT, event_id VARCHAR, destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
+      "CREATE TABLE images (image_url TEXT, event_id VARCHAR, destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
     );
     const q3 = await t.none(
       "CREATE TABLE review (review_id VARCHAR PRIMARY KEY, average_rating NUMERIC(2,1), provider VARCHAR, event_id VARCHAR , destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
@@ -74,19 +84,8 @@ async function DropAll() {
   return result;
 }
 
-async function createCurrency() {
-  const id = 1;
-  const result = await db.none(
-    "INSERT INTO currency (currency_id ,currency ) values (${id},'USD')",
-    {
-      id: id,
-    },
-  );
-}
-
 async function insert_to_db(data, destination_id) {
-  console.log(destination_id);
-  db.tx((t) => {
+  db.tx(async (t) => {
     const q1 = t.none(
       "INSERT INTO events (event_id,destination_id,title,description,url) VALUES(${event_id}, ${destination_id}, ${title}, ${description},  ${url})",
       {
@@ -108,7 +107,6 @@ async function insert_to_db(data, destination_id) {
         discount: data.pricing.summary.fromPriceBeforeDiscount,
       },
     );
-
     const q3 = t.none(
       "INSERT INTO over_all_ranting (event_id , destination_id) VALUES (${event_id}, ${destination_id} )",
       {
@@ -117,15 +115,41 @@ async function insert_to_db(data, destination_id) {
         destination_id: destination_id,
       },
     );
+
+    if (!_.isEmpty(data.images)) {
+      images = data.images[0].variants;
+    }
+    if (!_.isEmpty(images)) {
+      const cs = new pgp.helpers.ColumnSet(
+        ["image_url", "event_id", "destination_id"],
+        {
+          table: "images",
+        },
+      );
+
+      const values = images.map((image) => {
+        return {
+          image_url: image.url,
+          event_id: data.productCode,
+          destination_id: destination_id,
+        };
+      });
+
+      const imageQuery = pgp.helpers.insert(values, cs);
+
+      const result = await t.query(imageQuery);
+      return result;
+    }
+
     return t.batch([q1, q2, q3]); // all of the queries are to be resolved;
   });
 }
 
 module.exports = {
   insert_destinations,
+  insert_tags,
   create_event_table,
   create_partitions,
   DropAll,
   insert_to_db,
-  createCurrency,
 };
