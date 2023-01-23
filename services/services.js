@@ -31,7 +31,39 @@ async function create_partitions(destination_id, destinationName) {
   return result;
 }
 
-async function insert_reviews(data) {}
+async function insert_reviews(data, destination_id) {
+  if (!_.isEmpty(data.reviews)) {
+    reviews = data.reviews.sources;
+    const cs = new pgp.helpers.ColumnSet(
+      ["average_rating", "provider", "event_id", "destination_id"],
+      {
+        table: "review",
+      },
+    );
+
+    const values = reviews.map((review) => {
+      return {
+        average_rating: review.averageRating,
+        provider: review.provider,
+        event_id: data.productCode,
+        destination_id: destination_id,
+      };
+    });
+
+    const imageQuery = pgp.helpers.insert(values, cs);
+    const result = await db.query(imageQuery);
+
+    const q6 = await db.query(
+      "INSERT INTO over_all_ranting (rating ,event_id , destination_id) VALUES (${rating},${event_id}, ${destination_id} )",
+      {
+        rating: data.reviews.combinedAverageRating,
+        event_id: data.productCode,
+        destination_id: destination_id,
+      },
+    );
+    return result;
+  }
+}
 
 async function create_event_table() {
   const result = await db.tx(async (t) => {
@@ -45,7 +77,7 @@ async function create_event_table() {
       "CREATE TABLE images (image_url TEXT, event_id VARCHAR, destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
     );
     const q3 = await t.none(
-      "CREATE TABLE review (review_id VARCHAR PRIMARY KEY, average_rating NUMERIC(2,1), provider VARCHAR, event_id VARCHAR , destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
+      "CREATE TABLE review (average_rating NUMERIC(2,1), provider VARCHAR, event_id VARCHAR , destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
     );
     const q4 = await t.none(
       "CREATE TABLE tag_info (tag_id VARCHAR PRIMARY KEY , tag_name VARCHAR  )",
@@ -57,10 +89,10 @@ async function create_event_table() {
       "CREATE TABLE currency (currency_id VARCHAR PRIMARY KEY,currency VARCHAR )",
     );
     const q7 = await t.none(
-      "CREATE TABLE price (event_id VARCHAR,currency  VARCHAR, destination_id varchar , price NUMERIC(10,5),  discount NUMERIC (10,5), FOREIGN KEY (event_id , destination_id) REFERENCES events  (event_id , destination_id))",
+      "CREATE TABLE price (event_id VARCHAR,currency  VARCHAR, destination_id varchar , price NUMERIC(10,5),  discount NUMERIC (10,5) , FOREIGN KEY (event_id , destination_id) REFERENCES events  (event_id , destination_id))",
     );
     const q8 = await t.none(
-      "CREATE TABLE over_all_ranting (event_id VARCHAR,rating NUMERIC(5,4), destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id) )",
+      "CREATE TABLE over_all_ranting (rating NUMERIC(5,4),event_id VARCHAR, destination_id varchar ,FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
     );
     return t.batch([q0, q1, q2, q3, q4, q5, q6, q7, q8]); // all of the queries are to be resolved;
   });
@@ -85,8 +117,8 @@ async function DropAll() {
 }
 
 async function insert_to_db(data, destination_id) {
-  db.tx(async (t) => {
-    const q1 = t.none(
+  const result = await db.tx(async (t) => {
+    const q1 = await t.none(
       "INSERT INTO events (event_id,destination_id,title,description,url) VALUES(${event_id}, ${destination_id}, ${title}, ${description},  ${url})",
       {
         event_id: data.productCode,
@@ -97,7 +129,7 @@ async function insert_to_db(data, destination_id) {
       },
     );
 
-    const q2 = t.none(
+    const q2 = await t.none(
       "INSERT INTO price (event_id,currency , destination_id , price ,  discount ) VALUES (${event_id},${currency} , ${destination_id} , ${price} ,  ${discount} )",
       {
         event_id: data.productCode,
@@ -107,46 +139,68 @@ async function insert_to_db(data, destination_id) {
         discount: data.pricing.summary.fromPriceBeforeDiscount,
       },
     );
-    const q3 = t.none(
-      "INSERT INTO over_all_ranting (event_id , destination_id) VALUES (${event_id}, ${destination_id} )",
-      {
-        event_id: data.productCode,
-        //  rating: data.reviews.combinedAverageRating,
-        destination_id: destination_id,
-      },
-    );
 
     if (!_.isEmpty(data.images)) {
       images = data.images[0].variants;
+      if (!_.isEmpty(images)) {
+        const cs = new pgp.helpers.ColumnSet(
+          ["image_url", "event_id", "destination_id"],
+          {
+            table: "images",
+          },
+        );
+
+        const values = images.map((image) => {
+          return {
+            image_url: image.url,
+            event_id: data.productCode,
+            destination_id: destination_id,
+          };
+        });
+
+        const imageQuery = pgp.helpers.insert(values, cs);
+        var q3 = await t.query(imageQuery);
+      }
     }
-    if (!_.isEmpty(images)) {
+
+    if (!_.isEmpty(data.reviews)) {
+      reviews = data.reviews.sources;
       const cs = new pgp.helpers.ColumnSet(
-        ["image_url", "event_id", "destination_id"],
+        ["average_rating", "provider", "event_id", "destination_id"],
         {
-          table: "images",
+          table: "review",
         },
       );
 
-      const values = images.map((image) => {
+      const values = reviews.map((review) => {
         return {
-          image_url: image.url,
+          average_rating: review.averageRating,
+          provider: review.provider,
           event_id: data.productCode,
           destination_id: destination_id,
         };
       });
 
-      const imageQuery = pgp.helpers.insert(values, cs);
-
-      const result = await t.query(imageQuery);
-      return result;
+      const reviewQuery = pgp.helpers.insert(values, cs);
+      var q4 = await t.query(reviewQuery);
+      var q5 = await t.query(
+        "INSERT INTO over_all_ranting (rating ,event_id , destination_id) VALUES (${rating},${event_id}, ${destination_id} )",
+        {
+          rating: data.reviews.combinedAverageRating,
+          event_id: data.productCode,
+          destination_id: destination_id,
+        },
+      );
     }
 
-    return t.batch([q1, q2, q3]); // all of the queries are to be resolved;
+    return t.batch([q1, q2, q3, q4, q5]); // all of the queries are to be resolved;
   });
+  return result;
 }
 
 module.exports = {
   insert_destinations,
+  insert_reviews,
   insert_tags,
   create_event_table,
   create_partitions,

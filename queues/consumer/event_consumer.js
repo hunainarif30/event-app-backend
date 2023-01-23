@@ -1,6 +1,6 @@
 const { Kafka } = require("kafkajs");
 const _ = require("lodash");
-const { insert_to_db } = require("../../services/services");
+const { insert_to_db, insert_reviews } = require("../../services/services");
 const kafka = new Kafka({
   enforceRequestTimeout: true,
   clientId: "my-app",
@@ -20,16 +20,9 @@ async function main() {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const productData = await JSON.parse(message.value.toString());
-      // await productData.data.map(
-      //   async (item) => await insert_to_db(item, productData.destinationId),
-      // );
-
-      productData.data.map(async (item) => {
-        if (!_.isEmpty(item.reviews)) console.log(item.reviews);
-        else {
-          console.log("****************************************");
-        }
-      });
+      await productData.data.map(
+        async (item) => await insert_to_db(item, productData.destinationId),
+      );
     },
   });
 }
