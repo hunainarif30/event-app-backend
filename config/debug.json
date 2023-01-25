@@ -2,9 +2,10 @@
   "version": "v1",
   "destination": "/taxonomy/destinations",
   "event": "products/search",
+  "tags": "/products/tags",
   "database": {
     "pgsql": {
-      "host": "50.18.23.86",
+      "host": "localhost",
       "port": 7778,
       "database": "test_db",
       "user": "docker",

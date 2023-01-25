@@ -30,7 +30,7 @@ async function main() {
           data.destinationId,
           data.destinationType,
           data.start,
-          data.count
+          data.count,
           //  producer
         );
       }

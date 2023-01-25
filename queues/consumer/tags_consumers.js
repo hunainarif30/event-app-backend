@@ -1,7 +1,6 @@
 const { Kafka } = require("kafkajs");
-// const Services = require("../../services/services");
-const { recurse } = require("../producer/event_queue");
-const { insert_destinations } = require("../../services/services");
+const { insert_tags } = require("../../services/services");
+const { insert_to_db } = require("../../services/services");
 const kafka = new Kafka({
   enforceRequestTimeout: true,
   clientId: "my-app",
@@ -10,21 +9,18 @@ const kafka = new Kafka({
   requestTimeout: 25000,
 });
 
+var count = 0;
+
 async function main() {
   const consumer = kafka.consumer({
-    groupId: "test-group",
+    groupId: "test",
   });
   await consumer.connect();
-  await consumer.subscribe({ topic: "destination-queue" });
+  await consumer.subscribe({ topic: "tags-queue" });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const productData = await JSON.parse(message.value.toString());
-
-      await insert_destinations(
-        productData.destinationId,
-        productData.destinationName,
-      );
-      await recurse(productData);
+      await insert_tags(productData.tagId, productData.tagName);
     },
   });
 }
