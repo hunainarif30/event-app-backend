@@ -13,7 +13,7 @@ var count = 0;
 
 async function main() {
   const consumer = kafka.consumer({
-    groupId: "test-gr",
+    groupId: "test",
   });
   await consumer.connect();
   await consumer.subscribe({ topic: "tags-queue" });

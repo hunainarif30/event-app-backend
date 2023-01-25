@@ -1,5 +1,4 @@
 const { Kafka } = require("kafkajs");
-// const Services = require("../../services/services");
 const { recurse } = require("../producer/event_queue");
 const { insert_destinations } = require("../../services/services");
 const kafka = new Kafka({
