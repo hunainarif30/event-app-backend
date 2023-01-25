@@ -1,8 +1,6 @@
-//const createTable = require("../queries/create_queries");
 const db = require("../adapter/pgsql");
 var _ = require("lodash");
 const pgp = require("pg-promise")();
-const { v4: uuidv4 } = require("uuid");
 
 async function insert_destinations(id, destination_city) {
   const result = await db.query(
@@ -18,7 +16,6 @@ async function insert_tags(tagId, tagName) {
   );
   return result;
 }
-
 async function create_partitions(destination_id, destinationName) {
   Tablename = destinationName.replace(
     /[\(\)-\s\&\'\"\$\@\#\%\^\,\.\!\_\|\=\?\:\;]+/g,
@@ -30,41 +27,6 @@ async function create_partitions(destination_id, destinationName) {
   console.log(result);
   return result;
 }
-
-async function insert_reviews(data, destination_id) {
-  if (!_.isEmpty(data.reviews)) {
-    reviews = data.reviews.sources;
-    const cs = new pgp.helpers.ColumnSet(
-      ["average_rating", "provider", "event_id", "destination_id"],
-      {
-        table: "review",
-      },
-    );
-
-    const values = reviews.map((review) => {
-      return {
-        average_rating: review.averageRating,
-        provider: review.provider,
-        event_id: data.productCode,
-        destination_id: destination_id,
-      };
-    });
-
-    const imageQuery = pgp.helpers.insert(values, cs);
-    const result = await db.query(imageQuery);
-
-    const q6 = await db.query(
-      "INSERT INTO over_all_ranting (rating ,event_id , destination_id) VALUES (${rating},${event_id}, ${destination_id} )",
-      {
-        rating: data.reviews.combinedAverageRating,
-        event_id: data.productCode,
-        destination_id: destination_id,
-      },
-    );
-    return result;
-  }
-}
-
 async function create_event_table() {
   const result = await db.tx(async (t) => {
     const q0 = await t.none(
@@ -80,10 +42,10 @@ async function create_event_table() {
       "CREATE TABLE review (average_rating NUMERIC(2,1), provider VARCHAR, event_id VARCHAR , destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id))",
     );
     const q4 = await t.none(
-      "CREATE TABLE tag_info (tag_id VARCHAR PRIMARY KEY , tag_name VARCHAR  )",
+      "CREATE TABLE tag_info (tag_id VARCHAR PRIMARY KEY , tag_name VARCHAR)",
     );
     const q5 = await t.none(
-      "CREATE TABLE tags ( event_id VARCHAR ,tag_id VARCHAR, destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id), FOREIGN KEY (tag_id) REFERENCES tag_info (tag_id)  )",
+      "CREATE TABLE tags (tag_id VARCHAR, event_id VARCHAR , destination_id varchar , FOREIGN KEY (event_id , destination_id)REFERENCES events  (event_id , destination_id), FOREIGN KEY (tag_id) REFERENCES tag_info (tag_id))",
     );
     const q6 = await t.none(
       "CREATE TABLE currency (currency_id VARCHAR PRIMARY KEY,currency VARCHAR )",
@@ -98,7 +60,6 @@ async function create_event_table() {
   });
   return result;
 }
-
 async function DropAll() {
   const result = await db.tx(async (t) => {
     const q8 = await t.none("drop table over_all_ranting");
@@ -115,7 +76,28 @@ async function DropAll() {
   });
   return result;
 }
+async function insertTags(data, destination_id) {
+  if (!_.isEmpty(data.tags)) {
+    tags = data.tags;
+    const cs = new pgp.helpers.ColumnSet(
+      ["tag_id", "event_id", "destination_id"],
+      {
+        table: "tags",
+      },
+    );
 
+    const values = tags.map((tag) => {
+      return {
+        tag_id: tag,
+        event_id: data.productCode,
+        destination_id: destination_id,
+      };
+    });
+
+    const tagQuery = pgp.helpers.insert(values, cs);
+    var q4 = await db.query(tagQuery);
+  }
+}
 async function insert_to_db(data, destination_id) {
   const result = await db.tx(async (t) => {
     const q1 = await t.none(
@@ -200,7 +182,7 @@ async function insert_to_db(data, destination_id) {
 
 module.exports = {
   insert_destinations,
-  insert_reviews,
+  insertTags,
   insert_tags,
   create_event_table,
   create_partitions,
