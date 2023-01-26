@@ -1,13 +1,13 @@
 const createKafka = require("./kafkaproducer");
 var producer = createKafka();
-const TagsQueues = async (tagId, tagName) => {
+const TagsQueues = async (tags) => {
   try {
     await producer.connect();
     await producer.send({
       topic: "tags-queue",
       messages: [
         {
-          value: JSON.stringify({ tagId, tagName }),
+          value: JSON.stringify(tags),
         },
       ],
     });

@@ -1,4 +1,4 @@
-const { Kafka } = require("kafkajs");
+const { Kafka, logLevel } = require("kafkajs");
 const _ = require("lodash");
 const {
   insert_to_db,
@@ -11,11 +11,10 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
   connectionTimeout: 25000,
   requestTimeout: 25000,
+  logLevel: logLevel.ERROR,
 });
 
-var count = 0;
-
-async function main() {
+const event_consumer = async () => {
   const consumer = kafka.consumer({
     groupId: "test-gr",
   });
@@ -32,6 +31,6 @@ async function main() {
       );
     },
   });
-}
+};
 
-main();
+module.exports = event_consumer;
