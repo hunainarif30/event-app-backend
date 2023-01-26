@@ -7,7 +7,7 @@ const destinationQueue = async (
   destinationName,
   start,
   count,
-  ) => {
+) => {
   try {
     await producer.connect();
     await producer.send({

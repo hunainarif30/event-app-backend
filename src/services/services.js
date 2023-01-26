@@ -1,4 +1,4 @@
-const db = require("../adapter/pgsql");
+const db = require("../../adapter/pgsql");
 var _ = require("lodash");
 const { values } = require("lodash");
 const pgp = require("pg-promise")();

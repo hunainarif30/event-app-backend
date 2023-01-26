@@ -1,4 +1,4 @@
-const { Kafka } = require("kafkajs");
+const { Kafka, logLevel } = require("kafkajs");
 const { recurse } = require("../producer/event_queue");
 const { insert_destinations } = require("../../services/services");
 const kafka = new Kafka({
@@ -7,9 +7,10 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
   connectionTimeout: 25000,
   requestTimeout: 25000,
+  logLevel: logLevel.ERROR,
 });
 
-async function main() {
+const destination_consumer = async () => {
   const consumer = kafka.consumer({
     groupId: "test-group",
   });
@@ -25,6 +26,6 @@ async function main() {
       await recurse(productData);
     },
   });
-}
+};
 
-main();
+module.exports = destination_consumer;

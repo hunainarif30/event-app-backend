@@ -1,4 +1,4 @@
-const { eventInfo } = require("../../apis/event_api");
+const { eventInfo } = require("../../../apis/event_api");
 const { delayedQueue } = require("./delayed_queue");
 const createKafka = require("./kafkaproducer.js");
 const kafkaProducer = async (data, producer, destinationId) => {

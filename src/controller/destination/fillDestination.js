@@ -1,5 +1,5 @@
 const { destinationQueue } = require("../../queues/producer/destination_queue");
-const { getAllDestination } = require("../../apis/event_api");
+const { getAllDestination } = require("../../../apis/event_api");
 const { create_partitions } = require("../../services/services");
 
 const decisionMaker = {

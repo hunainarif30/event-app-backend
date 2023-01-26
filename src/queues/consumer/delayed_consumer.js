@@ -1,4 +1,4 @@
-const { Kafka } = require("kafkajs");
+const { Kafka, logLevel } = require("kafkajs");
 const { destinationQueue } = require("../producer/destination_queue");
 const createKafka = require("../producer/kafkaproducer");
 const { deadLetterQueue } = require("../producer/dead_letter_queue");
@@ -9,9 +9,9 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
   connectionTimeout: 25000,
   requestTimeout: 25000,
+  logLevel: logLevel.ERROR,
 });
-async function main() {
-  var producer = createKafka();
+const delayed_consumer = async () => {
   const consumer = kafka.consumer({ groupId: "test-group1" });
   await consumer.connect();
   await consumer.subscribe({ topic: "delayed-queue" });
@@ -24,8 +24,6 @@ async function main() {
         console.log("=============check dead letter===============");
         await deadLetterQueue(data);
       } else {
-        // console.log("delayed data consuming: ", data);
-        console.log("delayed queue se start aya : ", data.start);
         await destinationQueue(
           data.destinationId,
           data.destinationType,
@@ -36,6 +34,6 @@ async function main() {
       }
     },
   });
-}
+};
 
-main();
+module.exports = delayed_consumer;
