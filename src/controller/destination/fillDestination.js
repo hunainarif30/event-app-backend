@@ -27,7 +27,7 @@ async function fillDestination() {
   try {
     const result = await getAllDestination();
     result.map(async (element) => {
-      if (element.sortOrder > 1) {
+      if (element.sortOrder > 2) {
         return;
       }
       await decisionMaker[element.destinationType](element);

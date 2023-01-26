@@ -23,11 +23,8 @@ const event_consumer = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const productData = await JSON.parse(message.value.toString());
-      // await productData.data.map(
-      //   async (item) => await insert_to_db(item, productData.destinationId),
-      // );
       await productData.data.map(
-        async (item) => await insertTags(item, productData.destinationId),
+        async (item) => await insert_to_db(item, productData.destinationId)
       );
     },
   });
